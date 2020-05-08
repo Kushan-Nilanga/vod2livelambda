@@ -68,8 +68,8 @@ const epochstart = Number(process.env.EPOCHSTART) || 1588514400;
 const preSlidePath = process.env.PRESLIDEPATH || "lte/ffademo/pre_slide";
 const postSlidePath = process.env.POSTSLIDEPATH || "lte/ffademo/post_slide";
 const countDownPath = process.env.COUNTDOWNPATH || "lte/ffademo/5mincount";
-const preSlideSegments = Number(process.env.PRESLIDESEGMENTS) || 10;
-const postSlideSegments = Number(process.env.POSTSLIDESEGMENTS) || 10;
+const preSlideSegments = Number(process.env.PRESLIDESEGMENTS) || 30;
+const postSlideSegments = Number(process.env.POSTSLIDESEGMENTS) || 30;
 const liveWindow = Number(process.env.LIVEWINDOW) || 60;
 const domain = process.env.ORIGIN || 'http://vod1.syd2.vhe.telstra.com'
 const slideDomain = process.env.SLIDEDOMAIN || 'http://lteborigin.vos.bigpond.com'
@@ -216,8 +216,9 @@ function generatePlayList(playlist, startTime, currentTime, segmentLength, liveW
             let segmentNo = Math.floor(((liveWindowStartTime + elapsedTime) - startTime) / segmentLength)
             discontinuityFound = true;
             outSegments.push(new Segment({
+                uri: `${playlist.segments[segmentNo].uri}`,
 
-                uri: `${domain}${path}/${playlist.segments[segmentNo].uri}`,
+               // uri: `${domain}${path}/${playlist.segments[segmentNo].uri}`,
                 duration: playlist.segments[segmentNo].duration,
                 discontinuity: (segmentNo == 0)
             }))
