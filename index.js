@@ -210,12 +210,12 @@ async function generatePlayList(playlist, startTime, currentTime, segmentLength,
 
         else if (Math.floor(((liveWindowStartTime + elapsedTime) - startTime) / segmentLength) > playlist.segments.length) {
             if (postSlidePlaylist.length == 0) {
-                let postSlidePlaylistBody = await get(domain + `${postSlidePlaylist}${fileName}`);
+                let postSlidePlaylistBody = await get(domain + `${postSlidePath}${fileName}`);
                 postSlidePlaylist = HLS.parse(postSlidePlaylistBody).segments;
             }
             let segmentNo = Math.floor(((liveWindowStartTime + elapsedTime) - epochstart) / segmentLength % postSlideSegments)
             outSegments.push(new Segment({
-                uri: `${postSlidePlaylist}${postSlidePlaylist[segmentNo].uri}`,
+                uri: `${postSlidePath}${postSlidePlaylist[segmentNo].uri}`,
                 duration: segmentLength,
                 discontinuity: discontinuityFound || (segmentNo == 0)
             }))
