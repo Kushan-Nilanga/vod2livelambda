@@ -58,20 +58,21 @@ Manifest Manipulation Logic
                                                
 */
 
-const http = require('http');
+const http = require('https');
+const fetch = require('node-fetch');
 const HLS = require('hls-parser');
 
 const DEBUG = (process.env.DEBUG == 'true') || true;
 const countdown = Number(process.env.COUNTDOWN) || 1800;
 const segmentLength = Number(process.env.SEGMENTLENGTH) || 6;
 const epochstart = Number(process.env.EPOCHSTART) || 1588514400;
-const preSlidePath = process.env.PRESLIDEPATH || "/hls_ffa_h264_ts/ffa_pre_slide/";
-const postSlidePath = process.env.POSTSLIDEPATH || "/hls_ffa_h264_ts/ffa_post_slide/";
-const countDownPath = process.env.COUNTDOWNPATH || "/hls_ffa_h264_ts/ffa_5mincountdown/";
+const preSlidePath = process.env.PRESLIDEPATH || "/hls_ffa_h264_ts/FFA_PRESLIDE/";
+const postSlidePath = process.env.POSTSLIDEPATH || "/hls_ffa_h264_ts/FFA-Post-Slide/";
+const countDownPath = process.env.COUNTDOWNPATH || "/hls_ffa_h264_ts/FFA_Countdown/";
 const preSlideSegments = Number(process.env.PRESLIDESEGMENTS) || 30;
 const postSlideSegments = Number(process.env.POSTSLIDESEGMENTS) || 30;
 const liveWindow = Number(process.env.LIVEWINDOW) || 60;
-const domain = process.env.ORIGIN || 'http://vod1.syd2.vhe.telstra.com'
+const domain = process.env.ORIGIN || 'https://ffa-vod-hls-001-uptls.akamaized.net'
 const slideDomain = process.env.SLIDEDOMAIN || 'http://lteborigin.vos.bigpond.com'
 
 
@@ -128,15 +129,15 @@ function injectQuery(body, query) {
 }
 
 const get = async (url) => {
+    let options = {compress: true}
     return new Promise((resolve, reject) => {
-        http.get(url, res => {
-            res.setEncoding('utf8');
-            let body = '';
-            res.on('data', chunk => body += chunk);
-            res.on('end', () => resolve(body));
-        }).on('error', reject);
+        fetch(url,options)
+            .then(res => res.text())
+            .then(body => resolve(body))
+            .catch(err => reject);
     });
 };
+
 
 async function generatePlayList(playlist, startTime, currentTime, segmentLength, liveWindow, path, fileName) {
     let liveWindowStartTime = currentTime - liveWindow;
@@ -147,7 +148,7 @@ async function generatePlayList(playlist, startTime, currentTime, segmentLength,
     let preSlidePlaylist = new Array();
     let countDownSlidePlaylist = new Array();
     let postSlidePlaylist = new Array();
-    
+
 
     let outplaylist = new MediaPlaylist({
         mediaSequenceBase: Math.floor((currentTime - epochstart) / segmentLength),
