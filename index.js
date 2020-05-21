@@ -106,6 +106,10 @@ exports.handler = async (event, context) => {
 
             const regex = /([\/\w]+)\/([\w-]+.m3u8)/s;
             body = await generatePlayList(playlist, startTime, currentTime, segmentLength, liveWindow, path.match(regex)[1], path.match(regex)[2]);
+            if (!body) {
+                statusCode = '400';
+                body = "Failed to get VOD body"
+            }
         }
     } else {
         statusCode = '400';
